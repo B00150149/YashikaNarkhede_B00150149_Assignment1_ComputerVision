@@ -39,6 +39,25 @@ def threshold (img, thresh):
 
 
 
+#Binary morphology ( if it needs any further processing to clean it up basiclly close the interroir holes.)
+def erosion(img):
+    out = np.zeros_like(img)
+    for x in range(1, img.shape[0]-1):
+        for y in range(1,img.shape[1] - 1):
+            if np.min(img[x - 1: x + 2, y - 1: y + 2]) == 255:
+                out[x, y] = 255
+    return out
+
+def dilation(img):
+    out = np.zeros_like(img)
+    for x in range(1, img.shape[0]-1):
+        for y in range(1,img.shape[1] - 1):
+            if np.max(img[x - 1: x + 2, y - 1: y + 2]) == 255:
+                out[x, y] = 255
+    return out
+
+
+
 #Main 
 for i in range(1,16):
     #read in an image into memory
@@ -48,6 +67,9 @@ for i in range(1,16):
     thresh = threshold_auto(hist)
     bw = threshold(img, thresh)
    
+    bw = erosion(bw)  #erosion to dilation
+    bw = dilation(bw)
+
     rgb = cv.cvtColor(bw,cv.COLOR_GRAY2RGB)
     cv.putText(rgb, "Image:" + str(i) , (40, 40), cv.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
     cv.circle(rgb, (40, 40), 20, (0,0,255))
